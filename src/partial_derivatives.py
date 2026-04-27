@@ -35,8 +35,8 @@ class Partial:
     def biased_dx(self) -> np.ndarray:
         """
         Uses central difference approximation for interior points, forward difference approximation
-         at the first point, and backwards difference approximation at the last point to compute the
-         partial derivative with respect to x-direction.
+        at the first point, and backwards difference approximation at the last point to compute the
+        partial derivative with respect to x-direction in uniform grids.
         """
         return np.apply_along_axis(
             src.total_derivatives.biased_central_difference_approximation,
@@ -58,6 +58,11 @@ class Partial:
 
 
     def biased_dy(self) -> np.ndarray:
+        """
+        Uses central difference approximation for interior points, forward difference approximation
+        at the first point, and backwards difference approximation at the last point to compute the
+        partial derivative with respect to y-direction in uniform grids.
+        """
         return np.apply_along_axis(
             src.total_derivatives.biased_central_difference_approximation,
             axis=0,
@@ -67,6 +72,8 @@ class Partial:
 
 
     def periodic_dy(self) -> np.ndarray:
+        """Uses periodic wrapping at boundaries along with central difference approximation
+         to compute the partial derivative with respect to y-direction in uniform grids."""
         return np.apply_along_axis(
             src.total_derivatives.periodic_central_difference_approximation,
             axis=0,
@@ -75,14 +82,22 @@ class Partial:
         )
 
 
-    def dx(self):
+    def dx(self) -> np.ndarray:
+        """
+        Compute the partial derivative with respect to x-direction in uniform grids choosing
+        the most appropriate scheme to handle the boundary conditions (biased or periodic).
+        """
         if self.x_is_periodic():
             return self.periodic_dx()
         else:
             return self.biased_dx()
 
 
-    def dy(self):
+    def dy(self) -> np.ndarray:
+        """
+        Compute the partial derivative with respect to y-direction in uniform grids choosing
+        the most appropriate scheme to handle the boundary conditions (biased or periodic).
+        """
         if self.y_is_periodic():
             return self.periodic_dy()
         else:
@@ -90,6 +105,11 @@ class Partial:
 
 
     def biased_dxx(self) -> np.ndarray:
+        """
+        Compute the second order partial derivative approximation with respect to x in
+        uniform grids using biased forward difference approximation for the
+        first step and biased backward difference approximation for the last step.
+        """
         return np.apply_along_axis(
             src.total_derivatives.biased_second_order_derivative_approximation,
             axis=1,
@@ -99,6 +119,11 @@ class Partial:
 
 
     def periodic_dxx(self) -> np.ndarray:
+        """
+        Compute the second order partial derivative approximation in uniform grids
+        with respect to the x-direction of the function in uniform grids using the
+        periodic boundary condition.
+        """
         return np.apply_along_axis(
             src.total_derivatives.periodic_second_order_derivative_approximation,
             axis=1,
@@ -108,6 +133,11 @@ class Partial:
 
 
     def biased_dyy(self) -> np.ndarray:
+        """
+        Compute the second order partial derivative approximation with respect to y in
+        uniform grids using biased forward difference approximation for the
+        first step and biased backward difference approximation for the last step.
+        """
         return np.apply_along_axis(
             src.total_derivatives.biased_second_order_derivative_approximation,
             axis=0,
@@ -117,6 +147,10 @@ class Partial:
 
 
     def periodic_dyy(self) -> np.ndarray:
+        """
+        Compute the second order partial derivative approximation with respect to the y-direction
+        of the function in uniform grids using the periodic boundary condition.
+        """
         return np.apply_along_axis(
             src.total_derivatives.periodic_second_order_derivative_approximation,
             axis=0,
