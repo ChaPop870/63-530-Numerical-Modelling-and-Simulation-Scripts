@@ -234,17 +234,3 @@ class Partial:
 
     def __mul__(self, other: float):
         return Partial(self.function * other, self.x, self.y)
-
-# Setup Grid
-x = np.linspace(0, 1, 101)
-y = np.linspace(0, 1, 101)
-X, Y = np.meshgrid(x, y)
-
-# Define stream function
-psi = X * (1 - X) * Y * (1 - Y)
-
-# Define wind components
-u = Partial(psi, x, y).biased_dy()
-v = - Partial(psi, x, y).biased_dx()
-
-print(psi)
