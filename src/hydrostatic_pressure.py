@@ -16,7 +16,7 @@ exner_0_vector = exner_0 * np.ones(n)
 h = z[1] - z[0]
 
 
-def exner(theta: float | np.ndarray) -> float | np.ndarray:
+def dpi_dz(theta: float | np.ndarray) -> float | np.ndarray:
     exner_profile = - g / (Rd * theta)
     return exner_profile
 
