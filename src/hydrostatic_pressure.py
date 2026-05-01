@@ -7,8 +7,8 @@ g = 9.81
 Rd = 287.1
 gamma = 6.5e-3
 
-z = np.linspace(0, 100_000, 100_001)
-theta_0 = 1
+n = 10_001
+z = np.linspace(0, 100_000, n)
 theta_profile  = 300.0 + gamma * z
 
 
