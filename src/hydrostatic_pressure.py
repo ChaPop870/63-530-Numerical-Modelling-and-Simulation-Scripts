@@ -11,6 +11,10 @@ n = 10_001
 z = np.linspace(0, 100_000, n)
 theta_profile  = 300.0 + gamma * z
 
+exner_0 = 1
+exner_0_vector = exner_0 * np.ones(n)
+h = z[1] - z[0]
+
 
 def exner(theta: float | np.ndarray) -> float | np.ndarray:
     exner_profile = - g / (Rd * theta)
