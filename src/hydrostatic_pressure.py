@@ -31,8 +31,12 @@ def transformation_matrix(n: int) -> np.ndarray:
     return H
 
 
-y = exner(theta_profile)
+H = transformation_matrix(n)
+dpi_dz = dpi_dz(theta_profile)
+hydrostatic_pressure = h * np.linalg.inv(H - exner_0_vector) @ dpi_dz
+
+# dpi_dzy = exner(theta_profile)
 
 fig, ax = plt.subplots()
-ax.plot(y, z)
+ax.plot(hydrostatic_pressure, z)
 plt.show()
