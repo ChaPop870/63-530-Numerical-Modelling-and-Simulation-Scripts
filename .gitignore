@@ -19,3 +19,6 @@ Thumbs.db
 
 # Optional: ignore XML configs
 *.xml
+
+# Nums
+nums/
