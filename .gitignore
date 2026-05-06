@@ -1,5 +1,21 @@
-# Nums
-nums/
-
-*.xml
+# JetBrains IDE
+.idea/
 *.iml
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+.env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Optional: ignore XML configs
+*.xml
