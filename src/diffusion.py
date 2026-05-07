@@ -2,10 +2,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-n = 101
-x = np.linspace(0, 1, n)
-dx = x[1] - x[0]
-s = 10 * np.sin(np.pi * x)
+
+def bcs(lower: float, upper: float, function: np.ndarray) -> np.ndarray:
+    """
+    Boundary conditions vector given the values of the lower boundary, upper boundary and the
+    function.
+    """
+    bcs_vector = np.zeros_like(function)
+    bcs_vector[0] = lower
+    bcs_vector[-1] = upper
+    return bcs_vector
+
 
 def diffusion_matrix(n: int) -> np.ndarray:
     """Defines the n x n transformation matrix necessary to solve the diffusion problem."""
