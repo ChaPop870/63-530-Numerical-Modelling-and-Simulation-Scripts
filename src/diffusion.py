@@ -26,6 +26,7 @@ def diffusion_matrix(n: int) -> np.ndarray:
     return H
 
 H = diffusion_matrix(n)
+H_inv = np.linalg.inv(H)
 
 u = dx**2 * np.linalg.inv(H) @ s
 
