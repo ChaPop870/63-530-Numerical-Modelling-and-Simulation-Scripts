@@ -20,7 +20,12 @@ def diffusion_matrix(n: int) -> np.ndarray:
     H += np.diag(-1 * np.ones(n - 1), k=1)
     H += np.diag(2 * np.ones(n))
     H += np.diag(-1 * np.ones(n - 1), k=-1)
-    H[0, :3] = np.array([-1.5, 2.0, -0.5])
+
+    # Von Neumann boundary condition at bottom.
+    H[0, :] = 0
+    H[0, :3] = np.array([1.5, -2.0, 0.5])
+
+    # Dirichlet boundary condition at top.
     H[-1, :] = 0
     H[-1, -1] = 1.0
     return H
