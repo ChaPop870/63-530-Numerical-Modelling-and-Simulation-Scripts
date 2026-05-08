@@ -37,8 +37,30 @@ def diffusion_matrix(n: int) -> np.ndarray:
     return H
 
 
-def solve_system(transformation_matrix: np.ndarray, source: np.ndarray, boundary_conditions: np.ndarray) -> np.ndarray:
-    rhs = - dx**2 * source + boundary_conditions
+def solve_system(
+        transformation_matrix: np.ndarray,
+        h: float,
+        source: np.ndarray,
+        boundary_conditions: np.ndarray
+) -> (
+        np.ndarray):
+    """Solves the diffusion equation - d²u/dx² = s(x), given the source function s(x) and
+    the boundary conditions  du/dx = 𝛼 and u(x) = β.
+
+    Parameters:
+        transformation_matrix - the transformation matrix that solves the diffusion equation
+            for uniform grids using Von Neumann boundary conditions for the lower boundary
+            and Dirichlet boundary conditions at the upper boundary.
+
+        h - the grid spacing.
+
+        source - the array representing the source function.
+
+        boundary_conditions - the array representing the boundary conditions.
+
+    Returns: The solution u(x)
+    """
+    rhs = - h**2 * source + boundary_conditions
     return np.linalg.solve(transformation_matrix, rhs)
 
 
