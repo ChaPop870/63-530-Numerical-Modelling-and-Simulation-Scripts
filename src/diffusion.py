@@ -31,6 +31,12 @@ def diffusion_matrix(n: int) -> np.ndarray:
     return H
 
 
+def test_functions(source: np.ndarray, analytic_sol: np.ndarray, boundary_conditions: np.ndarray) -> np.ndarray:
+    """Test functions"""
+    return source, analytic_sol, boundary_conditions
+
+
+# Define domain and spacing.
 n = 101
 x = np.linspace(0, 1, n)
 dx = x[1] - x[0]
