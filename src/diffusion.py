@@ -69,6 +69,7 @@ n = 101
 x = np.linspace(0, 1, n)
 dx = x[1] - x[0]
 
+
 def main():
     # Define source functions.
     s1 = 10 * np.sin(np.pi * x)
@@ -76,13 +77,13 @@ def main():
     s3 = 6 * x
     s4 = np.exp(x)
 
-    # Define correct Analytic solution.
+    # Define correct analytic solutions.
     u1_analytic = (10 / np.pi ** 2) * np.sin(np.pi * x)
     u2_analytic = np.cos(0.5 * np.pi * x)
     u3_analytic = 1 - x ** 3
     u4_analytic = x - np.exp(x)
 
-    # Define boundary conditions.
+    # Define boundary conditions for each case.
     lower1, upper1 = (-dx * 10 / np.pi, 0)
     bcs1 = bcs(lower1, upper1, x)
 
