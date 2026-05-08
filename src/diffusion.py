@@ -23,9 +23,9 @@ def diffusion_matrix(n: int) -> np.ndarray:
     H = np.zeros((n, n))
 
     # Interior stencil.
-    H += np.diag(-1 * np.ones(n - 1), k=1)
-    H += np.diag(2 * np.ones(n))
-    H += np.diag(-1 * np.ones(n - 1), k=-1)
+    H += np.diag(1 * np.ones(n - 1), k=1)
+    H += np.diag(-2 * np.ones(n))
+    H += np.diag(1 * np.ones(n - 1), k=-1)
 
     # Von Neumann boundary condition at bottom.
     H[0, :] = 0
