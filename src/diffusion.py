@@ -37,9 +37,9 @@ def diffusion_matrix(n: int) -> np.ndarray:
     return H
 
 
-def test_functions(source: np.ndarray, analytic_sol: np.ndarray, boundary_conditions: np.ndarray) -> np.ndarray:
-    """Test functions"""
-    return source, analytic_sol, boundary_conditions
+def solve_system(transformation_matrix: np.ndarray, source: np.ndarray, boundary_conditions: np.ndarray) -> np.ndarray:
+    rhs = - dx**2 * source + boundary_conditions
+    return np.linalg.solve(transformation_matrix, rhs)
 
 
 # Define domain and spacing.
