@@ -25,6 +25,32 @@ def diffusion_matrix(n: int) -> np.ndarray:
     H[-1, -1] = 1.0
     return H
 
+
+n = 101
+x = np.linspace(0, 1, n)
+dx = x[1] - x[0]
+
+# Source
+s1 = 10 * np.sin(np.pi * x)
+# s2 = (0.5 * np.pi)**2 * np.cos(0.5 * np.pi * x)
+s3 = 6 * x
+s4 = - np.exp(x)
+# u_analytic = - np.cos(0.5 * np.pi * x)
+
+# Correct Analytic solution.
+u_analytic = - (10 / np.pi**2) * np.sin(np.pi * x)
+# u_analytic = 1 - x**3
+# u_analytic = np.exp(x) - x
+
+# H_inv = np.linalg.inv(H)
+
+# Boundary Conditions
+# lower = 0.5 * dx * (3 * u_analytic[2] - 4 * u_analytic[1] + u_analytic[0])
+lower = dx * 10 / np.pi
+# lower = 0
+upper = 0
+bcs = bcs(lower, upper, s1)
+
 H = diffusion_matrix(n)
 H_inv = np.linalg.inv(H)
 
