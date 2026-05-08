@@ -99,10 +99,10 @@ def main():
     H = diffusion_matrix(n)
 
     # Define numerical solutions.
-    u1 = solve_system(H, s1, bcs1)
-    u2 = solve_system(H, s2, bcs2)
-    u3 = solve_system(H, s3, bcs3)
-    u4 = solve_system(H, s4, bcs4)
+    u1 = solve_system(H, dx, s1, bcs1)
+    u2 = solve_system(H, dx, s2, bcs2)
+    u3 = solve_system(H, dx, s3, bcs3)
+    u4 = solve_system(H, dx, s4, bcs4)
 
     # Plotting.
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
