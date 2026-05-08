@@ -47,49 +47,53 @@ n = 101
 x = np.linspace(0, 1, n)
 dx = x[1] - x[0]
 
-# Define source functions.
-s1 = 10 * np.sin(np.pi * x)
-s2 = (0.5 * np.pi)**2 * np.cos(0.5 * np.pi * x)
-s3 = 6 * x
-s4 = np.exp(x)
+def main():
+    # Define source functions.
+    s1 = 10 * np.sin(np.pi * x)
+    s2 = (0.5 * np.pi) ** 2 * np.cos(0.5 * np.pi * x)
+    s3 = 6 * x
+    s4 = np.exp(x)
 
-# Define correct Analytic solution.
-u1_analytic = - (10 / np.pi**2) * np.sin(np.pi * x)
-u2_analytic = - np.cos(0.5 * np.pi * x)
-u3_analytic = 1 - x**3
-u4_analytic = np.exp(x) - x
+    # Define correct Analytic solution.
+    u1_analytic = (10 / np.pi ** 2) * np.sin(np.pi * x)
+    u2_analytic = np.cos(0.5 * np.pi * x)
+    u3_analytic = 1 - x ** 3
+    u4_analytic = x - np.exp(x)
 
-# Define boundary conditions.
-lower1, upper1 = (dx * 10 / np.pi, 0)
-bcs1 = bcs(lower1, upper1, x)
+    # Define boundary conditions.
+    lower1, upper1 = (-dx * 10 / np.pi, 0)
+    bcs1 = bcs(lower1, upper1, x)
 
-lower2, upper2 = (0, 0)
-bcs2 = bcs(lower2, upper2, x)
+    lower2, upper2 = (0, 0)
+    bcs2 = bcs(lower2, upper2, x)
 
-lower3, upper3 = (0, 1)
-bcs3 = bcs(lower3, upper3, x)
+    lower3, upper3 = (0, 0)
+    bcs3 = bcs(lower3, upper3, x)
 
-lower4, upper4 = (0, 0)
-bcs4 = bcs(lower4, upper4, x)
+    lower4, upper4 = (0, 1 - np.e)
+    bcs4 = bcs(lower4, upper4, x)
 
-# Define the transformation matrix specific to the diffusion problem.
-H = diffusion_matrix(n)
+    # Define the transformation matrix specific to the diffusion problem.
+    H = diffusion_matrix(n)
 
-rhs = - dx**2 * s1 + bcs
+    # Define numerical solutions.
+    u1 = solve_system(H, s1, bcs1)
+    u2 = solve_system(H, s2, bcs2)
+    u3 = solve_system(H, s3, bcs3)
+    u4 = solve_system(H, s4, bcs4)
 
-u = np.linalg.solve(H, rhs)
+    # Plotting.
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+    ax1.set_title("Source term s(x)")
+    ax1.plot(x, s4)
+    ax2.set_title("Solution")
+    ax2.plot(x, u4, label="Numerical")
+    ax2.plot(x, u4_analytic, "--", label="Analytic")
 
-# u = H_inv @ (s1 * -dx**2 + bcs)
-# y = 10 / ((np.pi)**2) * np.sin(np.pi * x)
-# y = x**2
+    ax2.legend()
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
-ax1.set_title("Source term s(x)")
-ax1.plot(x, s1)
-ax2.set_title("Solution")
-ax2.plot(x, u, label="Numerical")
-ax2.plot(x, u_analytic, "--", label="Analytic")
+    plt.show()
 
-ax2.legend()
 
-plt.show()
+if __name__ == "__main__":
+    main()
