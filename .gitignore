@@ -22,3 +22,14 @@ Thumbs.db
 
 # Nums
 nums/
+/nums.idea/
+
+.idea/
+*.iml
+/nums/.idea/.gitignore
+/nums/.idea/misc.xml
+/nums/.idea/modules.xml
+/nums/.idea/nums.iml
+/nums/.idea/inspectionProfiles/profiles_settings.xml
+/nums/.idea/inspectionProfiles/Project_Default.xml
+/nums/.idea/vcs.xml
