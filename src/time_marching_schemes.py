@@ -1,24 +1,52 @@
-# %%
+from collections.abc import Callable
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 
 # Euler Method.
-def euler(rhs, tn, un, dt):
-    """Solves a single step of the Euler Method."""
+def euler(
+        rhs: Callable[[float, float], float],
+        tn: float,
+        un: float,
+        dt: float
+) ->\
+        tuple[float, float]:
+    """Solves a single step of the Euler Method.
+
+        Parameters:
+        rhs - the function representing the RHS of the ODE to solve for.
+        tn - the current time.
+        un - the solution of the ODE.
+        dt - the time step.
+
+    Returns:
+        t, u - the tuple containing the domain and the solution to the ODE
+        in that domain.
+    """
     return tn + dt, un + dt * rhs(tn, un)
 
 
 # Third order Runge-Kutta Method
-def runge_kutta3(rhs, tn, un, dt):
+def runge_kutta3(
+        rhs: Callable[[float, float], float],
+        tn: float,
+        un: float,
+        dt: float
+) ->\
+        tuple[float, float]:
     """Solves a single step of the 3rd-order Runge-Kutta time-stepping
     method for solving an ODE.
 
     Parameters:
-        rhs - The function representing the RHS of the ODE to solve for.
+        rhs - the function representing the RHS of the ODE to solve for.
         tn - the current time.
         un - the solution of the ODE.
         dt - the time step.
+
+    Returns:
+        t, u - the tuple containing the domain and the solution to the ODE
+        in that domain.
     """
 
     # First slope estimate.
@@ -39,7 +67,29 @@ def runge_kutta3(rhs, tn, un, dt):
 
 
 # Solve the initial value problem.
-def solve_ivp(rhs, t0, u0, tf, dt, solver):
+def solve_ivp(
+        rhs: Callable[[float, float], float],
+        t0: float,
+        u0: float | np.ndarray,
+        tf: float,
+        dt: float,
+        solver: Callable
+) ->\
+        tuple[np.ndarray, np.ndarray]:
+    """Solves the IVP using the specified ODE solver.
+
+    Parameters:
+        rhs - the function representing the RHS of the ODE to solve for.
+        t0 - the initial time.
+        u0 - the initial value of the ODE.
+        tf  - the final time.
+        dt - the time step.
+
+    Note: This function can solve both single IVPs and systems of ODEs.
+
+    Returns:
+        t, u - a tuple containing the domain and the solution of the ODE.
+    """
     nt = int((tf - t0) / dt) + 1
     t = np.zeros(nt)
 
@@ -61,8 +111,8 @@ def solve_ivp(rhs, t0, u0, tf, dt, solver):
     return t, u
 
 
-def lorenz(t, u):
-
+def lorenz(t: float, u: float) -> np.ndarray:
+    """The Lorenz system."""
     x, y, z = u
 
     dxdt = -sigma*x + sigma*y
