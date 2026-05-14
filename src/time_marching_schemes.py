@@ -2,6 +2,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+# Solve the initial value problem.
+def solve_ivp(rhs, t0, u0, tf, dt, solver):
+    nt = int((tf - t0) / dt) + 1
+    t = np.zeros(nt)
+    u = np.zeros(nt)
+
+    # Initial conditions
+    t[0] = t0
+    u[0] = u0
+
+    # Time integration loop
+    for n in range(nt - 1):
+        t[n + 1], u[n + 1] = solver(rhs, t[n], u[n], dt)
+
+    return t, u
+
+
 # Euler Method.
 def euler(rhs, tn, yn, h):
     """Solves a single step of the Euler Method."""
