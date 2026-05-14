@@ -23,6 +23,8 @@ def runge_kutta3(rhs, tn, un, dt):
     # First slope estimate.
     k1 = rhs(tn, un)
 
+    # Mid-point estimate.
+    k2 = rhs(tn + 0.5*dt, un + 0.5*dt*k1)
 
 
 
