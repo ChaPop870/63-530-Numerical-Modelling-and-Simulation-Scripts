@@ -2,6 +2,41 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+# Euler Method.
+def euler(rhs, tn, un, dt):
+    """Solves a single step of the Euler Method."""
+    return tn + dt, un + dt * rhs(tn, un)
+
+
+# Third order Runge-Kutta Method
+def runge_kutta3(rhs, tn, un, dt):
+    """Solves a single step of the 3rd-order Runge-Kutta time-stepping
+    method for solving an ODE.
+
+    Parameters:
+        rhs - The function representing the RHS of the ODE to solve for.
+        tn - the current time.
+        un - the solution of the ODE.
+        dt - the time step.
+    """
+
+    # First slope estimate.
+    k1 = rhs(tn, un)
+
+    # Mid-point estimate.
+    k2 = rhs(tn + 0.5*dt,
+             un + 0.5*dt*k1)
+
+    # Third slope estimate.
+    k3 = rhs(tn + dt,
+             un + dt * (2*k2 - k1))
+
+    # Final weighted average.
+    u = un + dt * (k1 + 4*k2 + k3) / 6
+
+    return tn + dt, u
+
+
 # Solve the initial value problem.
 def solve_ivp(rhs, t0, u0, tf, dt, solver):
     nt = int((tf - t0) / dt) + 1
