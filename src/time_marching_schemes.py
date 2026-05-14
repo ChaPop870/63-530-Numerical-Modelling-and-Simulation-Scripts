@@ -41,7 +41,13 @@ def runge_kutta3(rhs, tn, un, dt):
 def solve_ivp(rhs, t0, u0, tf, dt, solver):
     nt = int((tf - t0) / dt) + 1
     t = np.zeros(nt)
-    u = np.zeros(nt)
+
+    # For systems of equations
+    if np.isscalar(u0):
+        u = np.zeros(nt)
+
+    else:
+        u = np.zeros((nt, len(u0)))
 
     # Initial conditions
     t[0] = t0
