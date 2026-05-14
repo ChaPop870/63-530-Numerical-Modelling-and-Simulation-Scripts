@@ -26,6 +26,13 @@ def runge_kutta3(rhs, tn, un, dt):
     # Mid-point estimate.
     k2 = rhs(tn + 0.5*dt, un + 0.5*dt*k1)
 
+    # Third slope estimate.
+    k3 = rhs(tn + dt, un + dt * (2*k2 - k1))
+
+    # Final weighted average.
+    u = un + dt * (k1 + 4*k2 + k3) / 6
+
+    return tn + dt, u
 
 
 # Parameters
