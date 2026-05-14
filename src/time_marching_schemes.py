@@ -5,7 +5,23 @@ import numpy as np
 # Euler Method.
 def euler(rhs, tn, yn, h):
     """Solves a single step of the Euler Method."""
-    return yn + h * rhs(tn, yn)
+    return tn + dt, un + dt * rhs(tn, un)
+
+
+# Third order Runge-Kutta Method
+def runge_kutta3(rhs, tn, un, dt):
+    """Solves a single step of the 3rd-order Runge-Kutta time-stepping
+    method for solving an ODE.
+
+    Parameters:
+        rhs - The function representing the RHS of the ODE to solve for.
+        tn - the current time.
+        un - the solution of the ODE.
+        dt - the time step.
+    """
+
+    # First slope estimate.
+    k1 = rhs(tn, un)
 
 
 
