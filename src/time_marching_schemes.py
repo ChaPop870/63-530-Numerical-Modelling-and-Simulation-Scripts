@@ -160,4 +160,8 @@ ax3.set_xlim(t0, tf)
 
 fig.suptitle("Lorenz Equations solution.", fontweight='bold')
 
-plt.show()
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
