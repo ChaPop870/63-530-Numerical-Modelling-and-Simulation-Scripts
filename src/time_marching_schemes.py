@@ -127,9 +127,11 @@ sigma = 10
 b = 8 / 3
 r = 28
 
-# Initial conditions.
-u0 = np.array([0, 1, 0])
-t0 = 0
+
+def main():
+    # Initial conditions.
+    u0 = np.array([0, 1, 0])
+    t0 = 0
 
 tf = 60
 dt = 0.01
