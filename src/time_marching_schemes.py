@@ -133,32 +133,32 @@ def main():
     u0 = np.array([0, 1, 0])
     t0 = 0
 
-tf = 60
-dt = 0.01
+    tf = 60
+    dt = 0.01
 
-t, u = solve_ivp(lorenz, t0, u0, tf, dt, solver=runge_kutta3)
+    t, u = solve_ivp(lorenz, t0, u0, tf, dt, solver=runge_kutta3)
 
-X = u[:, 0]
-Y = u[:, 1]
-Z = u[:, 2]
+    X = u[:, 0]
+    Y = u[:, 1]
+    Z = u[:, 2]
 
-# Plotting solutions of Lorenz equations.
-fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
+    # Plotting solutions of Lorenz equations.
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
 
-ax1.plot(t, X)
-ax1.set_ylabel('X(t)')
-ax1.set_xlim(t0, tf)
+    ax1.plot(t, X)
+    ax1.set_ylabel('X(t)')
+    ax1.set_xlim(t0, tf)
 
-ax2.plot(t, Y)
-ax2.set_ylabel('Y(t)')
-ax2.set_xlim(t0, tf)
+    ax2.plot(t, Y)
+    ax2.set_ylabel('Y(t)')
+    ax2.set_xlim(t0, tf)
 
-ax3.plot(t, Z)
-ax3.set_ylabel('Z(t)')
-ax3.set_xlabel('time / s')
-ax3.set_xlim(t0, tf)
+    ax3.plot(t, Z)
+    ax3.set_ylabel('Z(t)')
+    ax3.set_xlabel('time / s')
+    ax3.set_xlim(t0, tf)
 
-fig.suptitle("Lorenz Equations solution.", fontweight='bold')
+    fig.suptitle("Lorenz Equations solution.", fontweight='bold')
 
     plt.show()
 
