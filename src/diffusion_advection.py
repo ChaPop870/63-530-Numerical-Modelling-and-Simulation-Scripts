@@ -23,6 +23,7 @@ def transformation_dxx(n: int) -> np.ndarray:
     H += np.diag(np.ones(n - 1), k=1)
     H += np.diag(np.ones(n - 1), k=-1)
     H[0, -1] = 1
+    H[-1, 0] = 1
     return H
 
 
