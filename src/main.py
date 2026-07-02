@@ -1,16 +1,47 @@
-# This is a sample Python script.
-
-# Press Ctrl+F5 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import matplotlib.pyplot as plt
+import numpy as np
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press F9 to toggle the breakpoint.
+# Define the uniform, spatial grid for AEJ.
+# x_min = -15.0
+# x_max = 15.0
+# nx = 60
+
+y_min = 0.0
+y_max = 25.0
+ny = 50
+
+z_min = 0.0
+z_max = 5_000.0
+nz = 1_000
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+# Define the temporal grid.
+t_min = 0.0
+t_max = 2.0
+t_check = 0.05
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+# Define Reference profiles:
+def sine_reference(grid):
+    y = grid[0]
+    z = grid[1]
+
+    return np.sin(np.pi * y)
+
+
+def logistic_reference(grid):
+    y = grid[0]
+    z = grid[1]
+
+    return np.sin(np.pi * y)
+
+
+def preprocessing():
+    """Construct the grid and ICS."""
+    y = np.linspace(y_min, y_max, ny+1)
+    z = np.linspace(z_min, z_max, nz+1)
+
+    grid = np.meshgrid(y, z)
+
+    return grid
