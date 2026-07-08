@@ -53,3 +53,57 @@ def preprocessing():
     T = T_surface - gamma * Z
 
     return grid, T
+
+
+def simulation(grid, u):
+    pass
+
+
+def postprocessing(grid, data):
+    pass
+
+
+def save(grid, data):
+    pass
+
+
+def source(grid,t):
+    """Construct the source term: Saharan heating plus cooling in Gulf of Guinea"""
+    z = grid[0]
+    y = grid[1]
+
+    # Sahara heating
+    sahara = (3e-5 * np.exp(-((y-20)/4)**2) * np.exp(-z/2500))
+
+    # Gulf of Guinea cooling
+    gulf = (-2e-5 * np.exp(-((y-5)/4)**2) * np.exp(-z/2500))
+
+    return sahara + gulf
+
+
+def rhs(T,t):
+
+    d2Tdz2 = np.zeros_like(T)
+    d2Tdy2 = np.zeros_like(T)
+
+    # vertical diffusion
+    for j in range(ny):
+
+        d2Tdz2[:,j] = (
+            fdm2_e121(T[:,j])
+            /
+            dz**2
+        )
+
+    # meridional diffusion
+    for i in range(nx):
+
+        d2Tdy2[i,:] = (
+            fdm2_e121(T[i,:])
+            /
+            dy**2
+        )
+
+    diffusion = K*(d2Tdz2+d2Tdy2)
+
+    return diffusion + source(grid,t)
