@@ -44,4 +44,12 @@ def preprocessing():
 
     grid = np.meshgrid(y, z)
 
-    return grid
+    # Surface temperature latitude profile T(y).
+    Y, Z = grid[0], grid[1]
+    T_surface  = 0.4 * Y + 298.15
+
+    # Surface temperature height profile T(z).
+    gamma = 0.0065
+    T = T_surface - gamma * Z
+
+    return grid, T
