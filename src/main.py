@@ -1,25 +1,33 @@
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+
+from nums.pynums.fdms.fdm1 import fdm1_e2p
+from nums.pynums.partials import partial
+from nums.pynums.pdes.timemarching import *
+from nums.pynums.pdes.checkpointing import *
+from nums.pynums.pdes.postprocessing import *
+from nums.pynums.iodata import *
 
 
-# Define the uniform, spatial grid for AEJ.
-# x_min = -15.0
-# x_max = 15.0
-# nx = 60
-
+# Define the spatial grid.
 y_min = 0.0
 y_max = 25.0
-ny = 50
+ny = 100
 
 z_min = 0.0
 z_max = 5_000.0
-nz = 1_000
+nz = 80
 
 
 # Define the temporal grid.
 t_min = 0.0
-t_max = 2.0
-t_check = 0.05
+t_max = 20 * 86_400.0
+t_check = 2 * 86_400.0
+
+
+# Define the problem.
+timescheme = RungeKutta3()
+cnum = 0.20
 
 
 # Define Reference profiles:
@@ -69,14 +77,14 @@ def save(grid, data):
 
 def source(grid,t):
     """Construct the source term: Saharan heating plus cooling in Gulf of Guinea"""
-    z = grid[0]
-    y = grid[1]
+    Y = grid[0]
+    Z = grid[1]
 
     # Sahara heating
-    sahara = (3e-5 * np.exp(-((y-20)/4)**2) * np.exp(-z/2500))
+    sahara = (3e-5 * np.exp(-((Y - 20) / 4)**2) * np.exp(-Z / 2500))
 
     # Gulf of Guinea cooling
-    gulf = (-2e-5 * np.exp(-((y-5)/4)**2) * np.exp(-z/2500))
+    gulf = (-2e-5 * np.exp(-((Y - 5) / 4)**2) * np.exp(-Z / 2500))
 
     return sahara + gulf
 
@@ -86,24 +94,17 @@ def rhs(T,t):
     d2Tdz2 = np.zeros_like(T)
     d2Tdy2 = np.zeros_like(T)
 
-    # vertical diffusion
+    # vertical diffusion (second derivative in z)
     for j in range(ny):
+        d2Tdz2[:, j] = fdm2_e121(T[:, j]) / dz**2
 
-        d2Tdz2[:,j] = (
-            fdm2_e121(T[:,j])
-            /
-            dz**2
-        )
-
-    # meridional diffusion
+    # meridional diffusion (second derivative in y)
     for i in range(nx):
+        d2Tdy2[i, :] = fdm2_e121(T[i, :]) / dy**2
 
-        d2Tdy2[i,:] = (
-            fdm2_e121(T[i,:])
-            /
-            dy**2
-        )
+    diffusion = K * (d2Tdz2 + d2Tdy2)
 
-    diffusion = K*(d2Tdz2+d2Tdy2)
+    # Correct source term
+    S = source(grid, t)
 
-    return diffusion + source(grid,t)
+    return diffusion + S
