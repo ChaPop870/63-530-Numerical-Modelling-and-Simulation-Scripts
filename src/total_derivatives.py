@@ -14,8 +14,8 @@ def biased_forward_difference_approximation(
     for the first step.
 
     Parameters
-        domain - an array of the domain of the function.
         function - an array representing the function to be differentiated.
+        domain - an array of the domain of the function.
 
     Returns - the forward difference approximation of the function.
     """
@@ -46,8 +46,8 @@ def periodic_forward_difference_approximation(
     derivative in uniform grids using periodic approximation for the end points.
 
     Parameters
-        domain - an array of the domain of the function.
         function - an array representing the function to be differentiated.
+        domain - an array of the domain of the function.
 
     Returns - the forward difference approximation of the function.
     """
@@ -79,8 +79,8 @@ def biased_backward_difference_approximation(
     for the last step.
 
     Parameters
-        domain - an array of the domain of the function.
         function - an array representing the function to be differentiated.
+        domain - an array of the domain of the function.
 
     Returns - the backward difference approximation of the function.
     """
@@ -112,8 +112,8 @@ def periodic_backward_difference_approximation(
     the first step at the last step.
 
     Parameters
-        domain - an array of the domain of the function.
         function - an array representing the function to be differentiated.
+        domain - an array of the domain of the function.
 
     Returns - the backward difference approximation of the function.
     """
@@ -145,8 +145,8 @@ def biased_central_difference_approximation(
      and biased backward difference approximation for the last step.
 
     Parameters
-        domain - an array of the domain of the function.
         function - an array representing the function to be differentiated.
+        domain - an array of the domain of the function.
 
      Returns - the central difference approximation of the function.
     """
@@ -180,8 +180,8 @@ def periodic_central_difference_approximation(
      in uniform grids using periodic central difference at the boundaries.
 
     Parameters
-        domain - an array of the domain of the function.
         function - an array representing the function to be differentiated.
+        domain - an array of the domain of the function.
 
      Returns - the central difference approximation of the function.
     """
@@ -216,8 +216,8 @@ def biased_second_order_derivative_approximation(
     first step and biased backward difference approximation for the last step.
 
     Parameters
-        domain - an array of the domain of the function.
         function - an array representing the function to be differentiated.
+        domain - an array of the domain of the function.
 
     Returns - the second order derivative approximation of the function.
     """
@@ -252,8 +252,8 @@ def periodic_second_order_derivative_approximation(
     first step and biased backward difference approximation for the last step.
 
     Parameters
-        domain - an array of the domain of the function.
         function - an array representing the function to be differentiated.
+        domain - an array of the domain of the function.
 
     Returns - the second order derivative approximation of the function.
     """
