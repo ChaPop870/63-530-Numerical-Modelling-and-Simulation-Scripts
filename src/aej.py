@@ -148,8 +148,8 @@ dy = (111000.0 *
 dz = (zmax - zmin) / (nz - 1)
 
 # Meridional temperature gradient
-dTdy = np.gradient(T_final, dy, axis=1)
-
+# dTdy = np.gradient(T_final, dy, axis=1)
+dTdy = Partial(T_final, y*dy, z).biased_dx()
 
 # Thermal wind equation
 dug_dz = -(g / (f * T_final)) * dTdy
