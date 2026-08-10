@@ -52,29 +52,6 @@ def preprocessing():
     return (Y, Z), T
 
 
-# def simulation(grid, T):
-#
-#     data = checkPointing(delta_t=tcheck)
-#
-#     t = tmin
-#     it = 0
-#
-#     data.add(it, t, T)
-#
-#     while t < tmax:
-#
-#         T, t = timescheme.advanceStep(rhs, T, t)
-#
-#         it += 1
-#
-#         if t >= data.time2check:
-#
-#             data.add(it, t, T)
-#
-#             data.time2check += tcheck
-#
-#     return data
-
 def simulation(T):
 
     checkpoint = Checkpointing(delta_t=tcheck, t0=tmin)
@@ -151,12 +128,6 @@ def source(grid, t):
     return Q
 
 
-# def rhs(T, t):
-#
-#     Q = source(grid, t)
-#
-#     return Q - (T - Teq) / tau
-
 def rhs(t, T_flat):
 
     # Reshape 1-D state vector back into 2-D temperature field
@@ -179,10 +150,6 @@ f = 2 * Omega * np.sin(np.deg2rad(phi0))
 grid, T = preprocessing()
 
 Teq = equilibrium_temperature(grid)
-
-# data = simulation(grid, T)
-#
-# T_final = data.uchecked[-1]
 
 times, T_all, checkpoint = simulation(T)
 
