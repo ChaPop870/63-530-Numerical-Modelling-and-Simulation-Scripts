@@ -3,6 +3,8 @@ from collections.abc import Callable
 import matplotlib.pyplot as plt
 import numpy as np
 
+from src.checkpointing import Checkpointing
+
 
 # Euler Method.
 def euler(
@@ -73,7 +75,8 @@ def solve_ivp(
         u0: float | np.ndarray,
         tf: float,
         dt: float,
-        solver: Callable
+        solver: Callable,
+        checkpoint=None
 ) ->\
         tuple[np.ndarray, np.ndarray]:
     """Solves the IVP using the specified ODE solver.
@@ -104,9 +107,27 @@ def solve_ivp(
     t[0] = t0
     u[0] = u0
 
+    # Initial Checkpoint
+    if checkpoint is not None:
+        checkpoint.add(0, t[0], u[0])
+
     # Time integration loop
     for n in range(nt - 1):
-        t[n + 1], u[n + 1] = solver(rhs, t[n], u[n], dt)
+
+        dt_step = min(dt, tf - t[n])
+
+        t[n + 1], u[n + 1] = solver(rhs, t[n], u[n], dt_step)
+
+        # Checkpoint
+        if (
+            checkpoint is not None
+            and t[n + 1] >= checkpoint.time2check
+        ):
+            checkpoint.add(
+                n + 1,
+                t[n + 1],
+                u[n + 1]
+            )
 
     return t, u
 
