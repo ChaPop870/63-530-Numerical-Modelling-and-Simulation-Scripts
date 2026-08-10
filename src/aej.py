@@ -8,7 +8,7 @@ from nums.pynums.pdes.timemarching import *
 from nums.pynums.pdes.checkpointing import *
 from nums.pynums.pdes.postprocessing import *
 from nums.pynums.iodata import *
-from src.total_derivatives import biased_central_difference_approximation
+from src.partial_derivatives import Partial
 
 
 # Define the temporal grid
@@ -21,10 +21,12 @@ tcheck = 24 * 3600      # Time interval to checkpoint data
 ymin = 0.0
 ymax = 25.0
 ny = 101
+y = np.linspace(ymin, ymax, ny)
 
 zmin = 0.0
 zmax = 5_000.0
 nz = 101
+z = np.linspace(zmin, zmax, nz)
 
 
 # Define the problem.
@@ -35,12 +37,6 @@ timescheme.dt = dt
 
 
 def preprocessing():
-    # Latitude coordinate (0–25 degrees)
-    y = np.linspace(ymin, ymax, ny)
-
-    # Height coordinate (0–5000 m)
-    z = np.linspace(zmin, zmax, nz)
-
     # Build grid
     Y, Z = np.meshgrid(y, z)
 
@@ -78,50 +74,106 @@ def simulation(grid, T):
     return data
 
 
+# def equilibrium_temperature(grid):
+#
+#     y = grid[0]
+#     z = grid[1]
+#
+#     lapse = 0.0065
+#
+#     # Sahara warm anomaly
+#     sahara = (
+#         15.0
+#         * np.exp(-((y-20)/5.5)**2)
+#         * np.exp(-((z-2500)/800)**2)
+#     )
+#
+#     # Upper-level compensation
+#     upper_cooling = (
+#         -8.0
+#         * np.exp(-((y-20)/5)**2)
+#         * np.exp(-((z-4500)/700)**2)
+#     )
+#
+#     # Gulf marine cooling
+#     gulf = (
+#         -5.0
+#         * np.exp(-((y-5)/4)**2)
+#         * np.exp(-z/1200)
+#     )
+#
+#     Teq = (
+#         298.15
+#         + sahara
+#         + upper_cooling
+#         + gulf
+#         - lapse*z
+#     )
+#
+#     return Teq
+#
+#
+tau = 20 * 24 * 3600
+#
+# def rhs(T, t):
+#
+#     return -(T - Teq)/tau
+
+
 def equilibrium_temperature(grid):
 
     y = grid[0]
     z = grid[1]
 
-    lapse = 0.0065
-
-    # Sahara warm anomaly
-    sahara = (
-        15.0
-        * np.exp(-((y-20)/5.5)**2)
-        * np.exp(-((z-2500)/800)**2)
-    )
-
-    # Upper-level compensation
-    upper_cooling = (
-        -8.0
-        * np.exp(-((y-20)/5)**2)
-        * np.exp(-((z-4500)/700)**2)
-    )
-
-    # Gulf marine cooling
-    gulf = (
-        -5.0
-        * np.exp(-((y-5)/4)**2)
-        * np.exp(-z/1200)
-    )
+    lapse = 0.0065  # K/m
 
     Teq = (
         298.15
-        + sahara
-        + upper_cooling
-        + gulf
-        - lapse*z
+        - lapse * z
     )
 
     return Teq
 
 
-tau = 20 * 24 * 3600
+def source(grid, t):
+
+    y = grid[0]
+    z = grid[1]
+
+    # Characteristic forcing timescale
+    tau_forcing = 20 * 24 * 3600.0
+
+    # Sahara heating
+    sahara = (
+        (15.0 / tau_forcing)
+        * np.exp(-((y - 20.0) / 5.5)**2)
+        * np.exp(-((z - 2500.0) / 800.0)**2)
+    )
+
+    # Upper-level compensating cooling
+    upper_cooling = (
+        (-8.0 / tau_forcing)
+        * np.exp(-((y - 20.0) / 5.0)**2)
+        * np.exp(-((z - 4500.0) / 700.0)**2)
+    )
+
+    # Gulf of Guinea cooling
+    gulf = (
+        (-5.0 / tau_forcing)
+        * np.exp(-((y - 5.0) / 4.0)**2)
+        * np.exp(-z / 1200.0)
+    )
+
+    Q = sahara + upper_cooling + gulf
+
+    return Q
+
 
 def rhs(T, t):
 
-    return -(T - Teq)/tau
+    Q = source(grid, t)
+
+    return Q - (T - Teq) / tau
 
 
 # Define constants.
@@ -148,7 +200,6 @@ dy = (111000.0 *
 dz = (zmax - zmin) / (nz - 1)
 
 # Meridional temperature gradient
-# dTdy = np.gradient(T_final, dy, axis=1)
 dTdy = Partial(T_final, y*dy, z).biased_dx()
 
 # Thermal wind equation
