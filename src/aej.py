@@ -8,6 +8,7 @@ from nums.pynums.pdes.timemarching import *
 from nums.pynums.pdes.checkpointing import *
 from nums.pynums.pdes.postprocessing import *
 from nums.pynums.iodata import *
+from src.checkpointing import Checkpointing
 from src.partial_derivatives import Partial
 from src.time_marching_schemes import runge_kutta3, solve_ivp
 
@@ -51,74 +52,54 @@ def preprocessing():
     return (Y, Z), T
 
 
-def simulation(grid, T):
-
-    data = checkPointing(delta_t=tcheck)
-
-    t = tmin
-    it = 0
-
-    data.add(it, t, T)
-
-    while t < tmax:
-
-        T, t = timescheme.advanceStep(rhs, T, t)
-
-        it += 1
-
-        if t >= data.time2check:
-
-            data.add(it, t, T)
-
-            data.time2check += tcheck
-
-    return data
-
-
-# def equilibrium_temperature(grid):
+# def simulation(grid, T):
 #
-#     y = grid[0]
-#     z = grid[1]
+#     data = checkPointing(delta_t=tcheck)
 #
-#     lapse = 0.0065
+#     t = tmin
+#     it = 0
 #
-#     # Sahara warm anomaly
-#     sahara = (
-#         15.0
-#         * np.exp(-((y-20)/5.5)**2)
-#         * np.exp(-((z-2500)/800)**2)
-#     )
+#     data.add(it, t, T)
 #
-#     # Upper-level compensation
-#     upper_cooling = (
-#         -8.0
-#         * np.exp(-((y-20)/5)**2)
-#         * np.exp(-((z-4500)/700)**2)
-#     )
+#     while t < tmax:
 #
-#     # Gulf marine cooling
-#     gulf = (
-#         -5.0
-#         * np.exp(-((y-5)/4)**2)
-#         * np.exp(-z/1200)
-#     )
+#         T, t = timescheme.advanceStep(rhs, T, t)
 #
-#     Teq = (
-#         298.15
-#         + sahara
-#         + upper_cooling
-#         + gulf
-#         - lapse*z
-#     )
+#         it += 1
 #
-#     return Teq
+#         if t >= data.time2check:
 #
+#             data.add(it, t, T)
 #
+#             data.time2check += tcheck
+#
+#     return data
+
+def simulation(T):
+
+    checkpoint = Checkpointing(delta_t=tcheck, t0=tmin)
+
+    # Flatten initial temperature field
+    T0 = T.ravel()
+
+    # Solve the IVP
+    t, T_flat = solve_ivp(
+        rhs=rhs,
+        t0=tmin,
+        u0=T0,
+        tf=tmax,
+        dt=dt,
+        solver=runge_kutta3,
+        checkpoint=checkpoint
+    )
+
+    # Reshape each time step back to (nz, ny)
+    T = T_flat.reshape(len(t), nz, ny)
+
+    return t, T, checkpoint
+
+
 tau = 20 * 24 * 3600
-#
-# def rhs(T, t):
-#
-#     return -(T - Teq)/tau
 
 
 def equilibrium_temperature(grid):
@@ -170,11 +151,22 @@ def source(grid, t):
     return Q
 
 
-def rhs(T, t):
+# def rhs(T, t):
+#
+#     Q = source(grid, t)
+#
+#     return Q - (T - Teq) / tau
 
-    Q = source(grid, t)
+def rhs(t, T_flat):
 
-    return Q - (T - Teq) / tau
+    # Reshape 1-D state vector back into 2-D temperature field
+    T = T_flat.reshape(nz, ny)
+
+    # Temperature tendency
+    dTdt = source(grid, t) - (T - Teq) / tau
+
+    # Flatten again for solve_ivp
+    return dTdt.ravel()
 
 
 # Define constants.
@@ -188,9 +180,13 @@ grid, T = preprocessing()
 
 Teq = equilibrium_temperature(grid)
 
-data = simulation(grid, T)
+# data = simulation(grid, T)
+#
+# T_final = data.uchecked[-1]
 
-T_final = data.uchecked[-1]
+times, T_all, checkpoint = simulation(T)
+
+T_final = T_all[-1]
 
 
 # Grid spacing in metres.
