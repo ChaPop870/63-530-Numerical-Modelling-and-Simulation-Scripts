@@ -9,6 +9,7 @@ from nums.pynums.pdes.checkpointing import *
 from nums.pynums.pdes.postprocessing import *
 from nums.pynums.iodata import *
 from src.partial_derivatives import Partial
+from src.time_marching_schemes import runge_kutta3, solve_ivp
 
 
 # Define the temporal grid
