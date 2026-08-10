@@ -4,10 +4,6 @@ import numpy as np
 from matplotlib.colors import TwoSlopeNorm
 import matplotlib.pyplot as plt
 
-from nums.pynums.pdes.timemarching import *
-from nums.pynums.pdes.checkpointing import *
-from nums.pynums.pdes.postprocessing import *
-from nums.pynums.iodata import *
 from src.checkpointing import Checkpointing
 from src.partial_derivatives import Partial
 from src.time_marching_schemes import runge_kutta3, solve_ivp
@@ -32,10 +28,7 @@ z = np.linspace(zmin, zmax, nz)
 
 
 # Define the problem.
-timescheme = RungeKutta3()
-
 dt = 300.0         # 5 minutes
-timescheme.dt = dt
 
 
 def preprocessing():
@@ -157,14 +150,13 @@ T_final = T_all[-1]
 
 
 # Grid spacing in metres.
-dy = (111000.0 *
-      (ymax - ymin) /
-      (ny - 1))             # metres
+y_m = y * 111000.0
+dy = y_m[1] - y_m[0]
 
 dz = (zmax - zmin) / (nz - 1)
 
 # Meridional temperature gradient
-dTdy = Partial(T_final, y*dy, z).biased_dx()
+dTdy = Partial(T_final, y_m, z).biased_dx()
 
 # Thermal wind equation
 dug_dz = -(g / (f * T_final)) * dTdy
