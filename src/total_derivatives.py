@@ -277,6 +277,33 @@ def periodic_second_order_derivative_approximation(
     return ddx
 
 
+def antiderivative(
+        dydx: np.ndarray,
+        x: np.ndarray,
+        y0: float
+) \
+        -> np.ndarray:
+    """
+    Integrate a vertical derivative using the trapezoidal rule.
+    """
+
+    y = np.zeros_like(dydx)
+
+    y[0, :] = y0
+
+    for k in range(1, len(x)):
+        dx = x[k] - x[k - 1]
+
+        y[k, :] = (
+            y[k - 1, :]
+            + 0.5
+            * (y[k - 1, :] + y[k, :])
+            * dx
+        )
+
+    return y
+
+
 def main():
     x = np.linspace(-1, 1, 1_000)
     f1 = x
@@ -286,6 +313,7 @@ def main():
     ax.plot(x, periodic_second_order_derivative_approximation(f2, x))
     ax.set_ylim(-10, 10)
     plt.show()
+
 
 
 if __name__ == "__main__":
