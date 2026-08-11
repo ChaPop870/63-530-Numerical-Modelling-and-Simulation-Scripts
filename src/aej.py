@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from src.checkpointing import Checkpointing
 from src.partial_derivatives import Partial
 from src.time_marching_schemes import runge_kutta3, solve_ivp
+from src.total_derivatives import antiderivative
 
 
 # Define the temporal grid
@@ -28,7 +29,7 @@ z = np.linspace(zmin, zmax, nz)
 
 
 # Define the problem.
-dt = 300.0         # 5 minutes
+dt = 86_400
 
 
 def preprocessing():
@@ -161,19 +162,9 @@ dTdy = Partial(T_final, y_m, z).biased_dx()
 # Thermal wind equation
 dug_dz = -(g / (f * T_final)) * dTdy
 
-# Integrate downward from top boundary
-ug = np.zeros_like(T_final)
-
-# Surface reference wind
 ug_surface = -5.0   # m/s
-ug[0,:] = ug_surface
 
-for k in range(1, nz):
-
-    ug[k,:] = (
-        ug[k-1,:]
-        +0.5*(dug_dz[k-1,:] + dug_dz[k,:])*dz
-    )
+ug = antiderivative(dug_dz, z, ug_surface)
 
 
 # ==========================================================
