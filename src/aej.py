@@ -122,6 +122,27 @@ def source(grid, t):
     return Q
 
 
+def diffusion(T):
+    """
+    Compute the meridional diffusion of temperature.
+
+    Parameters
+    ----------
+    T : np.ndarray
+        Temperature field with shape (nz, ny).
+
+    Returns
+    -------
+    np.ndarray
+        Meridional temperature diffusion term.
+    """
+    kappa_y = 1.0e5  # m² s⁻¹
+
+    d2Tdy2 = Partial(T, y_m, z).neumann_dxx()
+
+    return kappa_y * d2Tdy2
+
+
 def rhs(t, T_flat):
 
     # Reshape 1-D state vector back into 2-D temperature field

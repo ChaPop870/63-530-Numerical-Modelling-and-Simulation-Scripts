@@ -118,6 +118,19 @@ class Partial:
         )
 
 
+    def neumann_dxx(self):
+        """
+        Compute the second order partial derivative approximation with respect to x in
+        uniform grids using Von Neumann boundary conditions.
+        """
+        return np.apply_along_axis(
+            src.total_derivatives.neumann_second_order_derivative_approximation,
+            axis=1,
+            arr=self.function,
+            domain=self.x
+        )
+
+
     def periodic_dxx(self) -> np.ndarray:
         """
         Compute the second order partial derivative approximation in uniform grids
@@ -140,6 +153,19 @@ class Partial:
         """
         return np.apply_along_axis(
             src.total_derivatives.biased_second_order_derivative_approximation,
+            axis=0,
+            arr=self.function,
+            domain=self.y
+        )
+
+
+    def neumann_dyy(self):
+        """
+        Compute the second order partial derivative approximation with respect to y in
+        uniform grids using Von Neumann boundary conditions.
+        """
+        return np.apply_along_axis(
+            src.total_derivatives.neumann_second_order_derivative_approximation,
             axis=0,
             arr=self.function,
             domain=self.y
