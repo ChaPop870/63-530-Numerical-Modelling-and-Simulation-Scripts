@@ -241,6 +241,42 @@ def biased_second_order_derivative_approximation(
     return ddx
 
 
+def neumann_second_order_derivative_approximation(
+        function: np.ndarray,
+        domain: np.ndarray
+) \
+        -> np.ndarray :
+    """
+    Compute the second derivative approximation on a uniform grid
+    using a central difference approximation in the interior and
+    homogeneous Neumann boundary conditions at both boundaries.
+
+    Parameters
+        function - an array representing the function to be differentiated.
+        domain - an array of the domain of the function.
+
+    Returns - the second order derivative approximation of the function.
+    """
+    x = domain
+    y = function
+    h = x[1] - x[0]
+    h_inv = 1 / h
+
+    # Initialize the result.
+    ddx = np.zeros_like(y)
+
+    # Neumann boundary condition at first point.
+    ddx[0] = 2 * h_inv * h_inv * (y[1] - y[0])
+
+    # Interior central difference approximation in interior.
+    ddx[1:-1] = h_inv * h_inv * (y[:-2] - 2 * y[1:-1] + y[2:])
+
+    # Neumann boundary condition at first point.
+    ddx[-1] = 2 * h_inv * h_inv * 2.0 * (y[-2] - y[-1])
+
+    return ddx
+
+
 def periodic_second_order_derivative_approximation(
         function: np.ndarray,
         domain: np.ndarray
@@ -294,12 +330,7 @@ def antiderivative(
     for k in range(1, len(x)):
         dx = x[k] - x[k - 1]
 
-        y[k, :] = (
-            y[k - 1, :]
-            + 0.5
-            * (y[k - 1, :] + y[k, :])
-            * dx
-        )
+        y[k, :] = (y[k - 1, :] + 0.5 * (dydx[k - 1, :] + dydx[k, :]) * dx)
 
     return y
 
