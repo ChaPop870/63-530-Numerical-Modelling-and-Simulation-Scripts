@@ -88,6 +88,11 @@ def equilibrium_temperature(grid):
     return Teq
 
 
+sahara_heating = 9.0   # Default 15.0
+comp_cooling = -4.5     # Default -8.0
+gulf_cooling = -3.0     # Default -5.0
+
+
 def source(grid, t):
 
     y = grid[0]
