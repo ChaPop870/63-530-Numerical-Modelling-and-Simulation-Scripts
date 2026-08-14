@@ -47,6 +47,17 @@ z = np.linspace(zmin, zmax, nz)
 dt = 86_400
 
 
+# Linear surface temperature profile for testing (Can be used without diffusion)
+# def T_surface(Y):
+#     """Define linear Surface temperature profile T(lat)"""
+#     return 0.4 * Y + 298.15
+
+
+def T_surface(y):
+    """Define Half cosine meridional surface profile for Neumann boundary condition."""
+    return 298.15 + 5.0 * (1.0 - np.cos(np.pi * y / 25.0))
+
+
 def preprocessing():
     # Build grid
     Y, Z = np.meshgrid(y, z)
