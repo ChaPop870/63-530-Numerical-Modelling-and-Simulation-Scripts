@@ -10,6 +10,21 @@ from src.time_marching_schemes import runge_kutta3, solve_ivp
 from src.total_derivatives import antiderivative
 
 
+# Model Parameters
+n_days = 60
+tau = 20 * 24 * 3600 # Seconds (Characteristic forcing timescale).
+day_number = -1         # Day number (-1 for final day)
+lapse_rate = 0.0065  # K/m
+
+sahara_heating = 4.0   # Default 9.0
+comp_cooling = -2.5    # Default -4.5
+gulf_cooling = -0.8    # Default -3.0
+convection = 0.0       # Default 0.0
+cooling = 0.0          # Default 0.0
+
+kappa_y = 200  # m² s⁻¹  # Default 1.0e2
+
+
 # Define the temporal grid
 tmin = 0.0              # Initial time
 tmax = 20 * 86_400.0    # Final time
