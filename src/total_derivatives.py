@@ -272,7 +272,7 @@ def neumann_second_order_derivative_approximation(
     ddx[1:-1] = h_inv * h_inv * (y[:-2] - 2 * y[1:-1] + y[2:])
 
     # Neumann boundary condition at first point.
-    ddx[-1] = 2 * h_inv * h_inv * 2.0 * (y[-2] - y[-1])
+    ddx[-1] = 2 * h_inv * h_inv * (y[-2] - y[-1])
 
     return ddx
 

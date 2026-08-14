@@ -27,7 +27,7 @@ kappa_y = 200  # m² s⁻¹  # Default 1.0e2
 
 # Define the temporal grid
 tmin = 0.0              # Initial time
-tmax = 20 * 86_400.0    # Final time
+tmax = n_days * 86_400.0    # Final time
 tcheck = 24 * 3600      # Time interval to checkpoint data
 
 
@@ -92,9 +92,6 @@ def simulation(T):
     return t, T, checkpoint
 
 
-tau = 20 * 24 * 3600
-
-
 def equilibrium_temperature(grid):
 
     y = grid[0]
@@ -105,44 +102,60 @@ def equilibrium_temperature(grid):
     return Teq
 
 
-sahara_heating = 9.0   # Default 15.0
-comp_cooling = -4.5     # Default -8.0
-gulf_cooling = -3.0     # Default -5.0
-
-
 def source(grid, t):
 
     y = grid[0]
     z = grid[1]
 
-    # Characteristic forcing timescale
-    tau_forcing = 20 * 24 * 3600.0
+    # Gaussian Saharan heating.
+    # sahara = (
+    #     (sahara_heating / tau_forcing)
+    #     * np.exp(-((y - 20.0) / 8)**2)
+    #     * np.exp(-((z - 2500.0) / 1600.0)**2)
+    # )
 
-    # Sahara heating
+    # Sigmoid Saharan heating
+    sahara_y = (1.0 / (1.0 + np.exp(-(y - 15.0) / 2.5)))
+
     sahara = (
-        (15.0 / tau_forcing)
-        * np.exp(-((y - 20.0) / 5.5)**2)
-        * np.exp(-((z - 2500.0) / 800.0)**2)
+            (sahara_heating / tau)
+            * sahara_y
+            * np.exp(-((z - 2500.0) / 1600.0) ** 2)
     )
 
     # Upper-level compensating cooling
     upper_cooling = (
-        (-8.0 / tau_forcing)
+        (comp_cooling / tau)
         * np.exp(-((y - 20.0) / 5.0)**2)
         * np.exp(-((z - 4500.0) / 700.0)**2)
     )
 
     # Gulf of Guinea cooling
     gulf = (
-        (-5.0 / tau_forcing)
+        (gulf_cooling / tau)
         * np.exp(-((y - 5.0) / 4.0)**2)
         * np.exp(-z / 1200.0)
     )
 
-    Q = sahara + upper_cooling + gulf
+    # Convective heating.
+    convective_heating = (
+            (convection / tau)
+            * np.exp(-((y - 9.0) / 2.0) ** 2)
+            * np.exp(-((z - 3000.0) / 1200.0) ** 2)
+    )
+
+    # Evaporative cooling beneath convective heating.
+    evaporative_cooling = (
+        (cooling / tau)
+        * np.exp(-((y - 9.0) / 3.5)**2)
+        * np.exp(-((z - 700.0) / 600.0)**2)
+    )
+
+    Q = sahara + upper_cooling + gulf + convective_heating + evaporative_cooling
 
     return Q
 
+y_m = y * 111000.0
 
 def diffusion(T):
     """
@@ -158,7 +171,6 @@ def diffusion(T):
     np.ndarray
         Meridional temperature diffusion term.
     """
-    kappa_y = 1.0e5  # m² s⁻¹
 
     d2Tdy2 = Partial(T, y_m, z).neumann_dxx()
 
@@ -171,7 +183,7 @@ def rhs(t, T_flat):
     T = T_flat.reshape(nz, ny)
 
     # Temperature tendency
-    dTdt = source(grid, t) - (T - Teq) / tau
+    dTdt = source(grid, t) - (T - Teq) / tau + diffusion(T)
 
     # Flatten again for solve_ivp
     return dTdt.ravel()
@@ -190,11 +202,10 @@ Teq = equilibrium_temperature(grid)
 
 times, T_all, checkpoint = simulation(T)
 
-T_final = T_all[-1]
+T_final = T_all[day_number]
 
 
 # Grid spacing in metres.
-y_m = y * 111000.0
 dy = y_m[1] - y_m[0]
 
 dz = (zmax - zmin) / (nz - 1)
@@ -202,12 +213,47 @@ dz = (zmax - zmin) / (nz - 1)
 # Meridional temperature gradient
 dTdy = Partial(T_final, y_m, z).biased_dx()
 
+# Uncomment to test what happens the preprocessed T is used.
+# dTdy = Partial(T, y_m, z).biased_dx()
+
 # Thermal wind equation
 dug_dz = -(g / (f * T_final)) * dTdy
 
 ug_surface = -5.0   # m/s
 
 ug = antiderivative(dug_dz, z, ug_surface)
+
+
+# ==========================================================
+# Plot final temperature field
+# ==========================================================
+
+plt.figure(figsize=(8, 5))
+
+# Temperature contour levels at 5 K intervals
+T_min = np.floor(T_final.min() / 5.0) * 5.0
+T_max = np.ceil(T_final.max() / 5.0) * 5.0
+levels = np.arange(T_min, T_max + 5.0, 2.0)
+
+plt.contourf(
+    grid[0],
+    grid[1],
+    T_final,
+    levels=levels,
+    cmap="plasma",
+    extend="both",
+)
+
+plt.colorbar(
+    label="Temperature (K)"
+)
+
+plt.xlabel("Latitude (degrees)")
+plt.ylabel("Height (m)")
+plt.title("Final Temperature Field")
+
+plt.tight_layout()
+plt.show()
 
 
 # ==========================================================
@@ -268,19 +314,20 @@ plt.show()
 
 plt.figure(figsize=(8,5))
 
-limit = np.max(np.abs(ug))
-norm = TwoSlopeNorm(vmin=-limit, vcenter=0.0, vmax=limit)
+vmin, vmax = -15, 15
+norm = TwoSlopeNorm(vmin=vmin, vcenter=0.0, vmax=vmax)
 
-plt.pcolormesh(
+plt.contourf(
     grid[0],
     grid[1],
     ug,
-    shading="auto",
+    levels=np.arange(vmin, vmax+1),          # optional: smoother contours
     cmap="RdBu_r",
     norm=norm,
+    extend='both',
 )
 
-plt.colorbar(label="Geostrophic wind (m s$^{-1}$)")
+plt.colorbar(label="Geostrophic wind (m s$^{-1}$)", )
 plt.xlabel("Latitude (degrees)")
 plt.ylabel("Height (m)")
 plt.title("African Easterly Jet")
