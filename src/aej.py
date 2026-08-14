@@ -62,12 +62,8 @@ def preprocessing():
     # Build grid
     Y, Z = np.meshgrid(y, z)
 
-    # Surface temperature profile T(lat)
-    T_surface = 0.4 * Y + 298.15
-
-    # Apply lapse rate
-    lapse_rate = 0.0065  # K/m
-    T = T_surface - lapse_rate * Z
+    # Apply lapse rate to meridional surface profile.
+    T = T_surface(Y) - lapse_rate * Z
 
     return (Y, Z), T
 
