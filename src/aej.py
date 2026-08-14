@@ -221,7 +221,24 @@ dug_dz = -(g / (f * T_final)) * dTdy
 
 ug_surface = -5.0   # m/s
 
-ug = antiderivative(dug_dz, z, ug_surface)
+U_m = 5.0       # Maximum monsoon wind (m/s)
+y_m = 10.0       # Latitude of maximum wind (degrees N)
+L_y = 4.0       # Meridional width (degrees)
+H_m = 800.0     # Height of maximum monsoon wind (m)
+
+# Meridional structure
+monsoon_y = np.exp(-((grid[0] - y_m) / L_y)**2)
+
+# Vertical structure:
+# zero at surface, maximum at H_m, then decays
+monsoon_z = (
+    (grid[1] / H_m)
+    * np.exp(1.0 - grid[1] / H_m)
+)
+
+u_monsoon = U_m * monsoon_y * monsoon_z
+
+ug = ug_thermal + u_monsoon
 
 
 # ==========================================================
