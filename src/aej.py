@@ -100,12 +100,7 @@ def equilibrium_temperature(grid):
     y = grid[0]
     z = grid[1]
 
-    lapse = 0.0065  # K/m
-
-    Teq = (
-        298.15
-        - lapse * z
-    )
+    Teq = (298.15 - lapse_rate * z)
 
     return Teq
 
