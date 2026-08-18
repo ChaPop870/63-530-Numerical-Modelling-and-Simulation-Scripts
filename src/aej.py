@@ -351,3 +351,160 @@ plt.title("African Easterly Jet")
 
 plt.tight_layout()
 plt.show()
+
+
+
+
+
+
+
+
+
+
+
+# # ==========================================================
+# # Run the model for a specified diffusion coefficient
+# # ==========================================================
+#
+# def run_model(kappa):
+#     """
+#     Run the AEJ model for a specified meridional diffusion coefficient.
+#
+#     Parameters
+#     ----------
+#     kappa : float
+#         Meridional temperature diffusivity (m^2 s^-1).
+#
+#     Returns
+#     -------
+#     T_final : np.ndarray
+#         Final temperature field.
+#     ug : np.ndarray
+#         Geostrophic wind field.
+#     dTdy : np.ndarray
+#         Meridional temperature gradient.
+#     dug_dz : np.ndarray
+#         Thermal wind shear.
+#     """
+#
+#     global kappa_y
+#
+#     # Set diffusion coefficient
+#     kappa_y = kappa
+#
+#     # Recreate initial condition
+#     grid, T = preprocessing()
+#
+#     # Equilibrium temperature
+#     global Teq
+#     Teq = equilibrium_temperature(grid)
+#
+#     # Run model
+#     times, T_all, checkpoint = simulation(T)
+#
+#     # Select final time
+#     T_final = T_all[day_number]
+#
+#     # Meridional temperature gradient
+#     dTdy = Partial(
+#         T_final,
+#         y_m,
+#         z
+#     ).biased_dx()
+#
+#     # Thermal wind shear
+#     dug_dz = -(g / (f * T_final)) * dTdy
+#
+#     # Thermally driven wind
+#     ug_thermal = antiderivative(
+#         dydx=dug_dz,
+#         x=z,
+#         y0=0.0
+#     )
+#
+#     # ------------------------------------------------------
+#     # Low-level monsoon circulation
+#     # ------------------------------------------------------
+#
+#     U_monsoon = 5.0
+#     y_monsoon = 10.0
+#     L_monsoon = 5.5
+#     H_monsoon = 400.0
+#
+#     monsoon_y = np.exp(
+#         -((grid[0] - y_monsoon) / L_monsoon)**2
+#     )
+#
+#     monsoon_z = (
+#         (grid[1] / H_monsoon)
+#         * np.exp(1.0 - grid[1] / H_monsoon)
+#     )
+#
+#     u_monsoon = U_monsoon * monsoon_y * monsoon_z
+#
+#     # Total geostrophic/diagnostic wind
+#     ug = ug_thermal + u_monsoon
+#
+#     return T_final, ug, dTdy, dug_dz
+#
+#
+#
+#
+# # ==========================================================
+# # Run both diffusion experiments
+# # ==========================================================
+#
+# T_diff, ug_diff, dTdy_diff, shear_diff = run_model(200.0)
+#
+# T_nodiff, ug_nodiff, dTdy_nodiff, shear_nodiff = run_model(0.0)
+#
+#
+# # ==========================================================
+# # Difference between diffusion and no-diffusion cases
+# # ==========================================================
+#
+# delta_T = T_diff - T_nodiff
+# delta_ug = ug_diff - ug_nodiff
+# delta_dTdy = dTdy_diff - dTdy_nodiff
+# delta_shear = shear_diff - shear_nodiff
+#
+# # ==========================================================
+# # Plot difference in geostrophic wind
+# # ==========================================================
+#
+# plt.figure(figsize=(8, 5))
+#
+# limit = np.max(np.abs(delta_ug))
+#
+# norm = TwoSlopeNorm(
+#     vmin=-limit,
+#     vcenter=0.0,
+#     vmax=limit
+# )
+#
+# levels = np.linspace(-0.005, 0.005, 21)
+#
+# plt.contourf(
+#     grid[0],
+#     grid[1],
+#     delta_ug,
+#     levels=levels,
+#     cmap="RdBu_r",
+#     norm=norm,
+#     extend="both"
+# )
+#
+# plt.colorbar(
+#     label=r"$\Delta u_g$ (m s$^{-1}$)"
+# )
+#
+# plt.xlabel("Latitude / degrees")
+# plt.ylabel("Height / m")
+#
+# plt.title(
+#     r"Effect of meridional diffusion on the AEJ: "
+#     r"$\kappa_y=200 - \kappa_y=0$"
+# )
+#
+# plt.tight_layout()
+# plt.show()
