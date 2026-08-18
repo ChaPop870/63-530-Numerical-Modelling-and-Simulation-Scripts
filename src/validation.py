@@ -180,7 +180,83 @@ ax4.set_title(
 )
 
 
-# Test 3: Vertical integration.
+# Test 3: Testing second derivative of partial derivative
+def d2udx2_analytic(x):
+    """Analytical derivative of
+        f(x) = cos(2𝝅x)
+    """
+    return -(2 * np.pi)**2 * np.cos(2 * np.pi * x)
+
+
+nx = 101
+x = np.linspace(0.0, 1.0, nx)
+
+f = np.cos(2 * np.pi * x)
+
+# Numerical second derivative using Partial
+d2f_numerical = Partial(f[np.newaxis, :], x).neumann_dxx()[0]
+
+# Analytical second derivative
+d2f_exact = d2udx2_analytic(x)
+
+# Error
+error = d2f_numerical - d2f_exact
+
+print(f"Maximum absolute error: {np.max(np.abs(error)):.6e}")
+print(f"RMSE: {np.sqrt(np.mean(error**2)):.6e}")
+
+
+# Plotting
+fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
+
+# Original function
+ax1.plot(x, f, label="f(x)")
+ax1.set_ylabel("f(x)")
+ax1.set_title("Test function")
+ax1.legend()
+
+
+# Second derivative
+ax2.plot(
+    x,
+    d2f_exact,
+    label="Analytical $f''(x)$"
+)
+
+ax2.plot(
+    x,
+    d2f_numerical,
+    "--",
+    label="Numerical $f''(x)$"
+)
+
+ax2.set_ylabel("$f''(x)$")
+ax2.set_title("Second derivative")
+ax2.legend()
+
+
+# Error
+ax3.plot(
+    x,
+    error,
+    label="Numerical - Analytical"
+)
+
+ax3.axhline(0, linestyle="--")
+ax3.set_xlabel("x")
+ax3.set_ylabel("Error")
+ax3.set_title("Second derivative error")
+ax3.legend()
+
+for ax in [ax1, ax2, ax3]:
+    ax.set_xlim(0, 1)
+
+
+plt.tight_layout()
+plt.show()
+
+
+# Test 4: Vertical integration.
 
 def dydz_analytic(z):
     """
