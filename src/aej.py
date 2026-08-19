@@ -1,6 +1,6 @@
-import numpy as np
 from matplotlib.colors import TwoSlopeNorm
 import matplotlib.pyplot as plt
+import numpy as np
 
 from src.checkpointing import Checkpointing
 from src.partial_derivatives import Partial
@@ -63,10 +63,10 @@ dt = 86_400
 #     return 0.4 * Y + 298.15
 
 
-def T_surface(y):
+def T_surface(Y):
     """Define Half cosine meridional surface profile to satisfy Neumann boundary
     condition."""
-    return T0 + 5.0 * (1.0 - np.cos(np.pi * y / 25.0))
+    return T0 + 5.0 * (1.0 - np.cos(np.pi * Y / 25.0))
 
 
 def preprocessing():
@@ -82,7 +82,8 @@ def preprocessing():
 
 
 def simulation(T):
-
+    """Marches the supplied temperature field forward in time using
+    the Runge-Kutta3 Method."""
     checkpoint = Checkpointing(delta_t=tcheck, t0=tmin)
 
     # Flatten initial temperature field
@@ -173,7 +174,7 @@ y_m = y * 111000.0
 
 def diffusion(T):
     """
-    Compute the meridional diffusion of temperature.
+    Compute the meridional diffusion of temperature using Neumann BCS.
 
     Parameters
     ----------
@@ -195,7 +196,6 @@ def rhs(t: np.ndarray, T_flat: np.ndarray) -> np.ndarray:
     """Defines the RHS of the temperature equation to be solved.
 
     ∂T/∂t = Q(y, z) − (T − T_eq)/τ_r + κ_y ∂²T/∂y²
-
     """
     # Reshape 1-D state vector back into 2-D temperature field
     T = T_flat.reshape(nz, ny)
@@ -238,35 +238,24 @@ grid, T = preprocessing()
 Teq = equilibrium_temperature(grid)
 
 
+# Main program.
 def main():
     global day_number
-    # Main program.
     times, T_all, checkpoint = simulation(T)
 
     T_final = T_all[day_number]
 
-    # Grid spacing in metres.
-    # dy = y_m[1] - y_m[0]
-    #
-    # dz = (zmax - zmin) / (nz - 1)
 
-    # Meridional temperature gradient
+    # Compute meridional temperature gradient.
     dTdy = Partial(T_final, y_m, z).biased_dx()
 
     # Uncomment to test what happens if the preprocessed T is used.
     # dTdy = Partial(T, y_m, z).biased_dx()
 
-    # Thermal wind equation
+    # Compute thermal wind shear.
     dug_dz = -(g / (f * T_final)) * dTdy
 
-    # ug_surface = 5.0 * np.tanh((20.0 - y) / 4.0)   # m/s
-    #
-    # ug = antiderivative(dug_dz, z, ug_surface)
-
-    # ----------------------------------------------------------
-    # Thermally driven wind
-    # ----------------------------------------------------------
-
+    # Compute geostrophic wind from thermal wind.
     ug_thermal = antiderivative(
         dydx=dug_dz,
         x=z,
@@ -274,6 +263,7 @@ def main():
     )
 
     ug = ug_thermal + generate_monsoon()
+
 
     # ==========================================================
     # Plot temperature field
@@ -306,6 +296,7 @@ def main():
     plt.tight_layout()
     plt.show()
 
+
     # ==========================================================
     # Plot dT/dy
     # ==========================================================
@@ -332,6 +323,7 @@ def main():
 
     plt.tight_layout()
     plt.show()
+
 
     # ==========================================================
     # Plot thermal wind shear
@@ -385,10 +377,11 @@ def main():
     ax.set_ylabel("Height / m")
     ax.set_title(f"African Easterly Jet after {day_number} days.")
 
+
     plt.tight_layout()
     plt.show()
 
-    # Quick diffusion plot from AI for the sake of time.
+    # Uncomment the following to also attain a quick diffusion plot from AI for the sake of time.
 
     # # ==========================================================
     # # Run the model for a specified diffusion coefficient
