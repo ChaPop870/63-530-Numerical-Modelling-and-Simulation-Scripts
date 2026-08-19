@@ -20,7 +20,7 @@ f = 2 * Omega * np.sin(np.deg2rad(phi0))
 n_days = 60
 tau = 20 * 24 * 3600 # Seconds (Characteristic forcing timescale).
 tau_convection = 3 * 24 * 3600
-day_number = -1      # Day number (-1 for final day)
+day_number = 60      # Day number (-1 for final day)
 lapse_rate = 0.0065  # K/m
 
 # Forcing parameters.
@@ -233,15 +233,14 @@ grid, T = preprocessing()
 
 Teq = equilibrium_temperature(grid)
 
-day_number = 60
+grid, T = preprocessing()
+
+Teq = equilibrium_temperature(grid)
+
 
 def main():
-    global grid, T, Teq, day_number
+    global day_number
     # Main program.
-    grid, T = preprocessing()
-
-    Teq = equilibrium_temperature(grid)
-
     times, T_all, checkpoint = simulation(T)
 
     T_final = T_all[day_number]
